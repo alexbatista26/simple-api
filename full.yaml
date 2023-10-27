@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  labels:
+    app: simple-api
+  name: simple-api
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: simple-api
+  template:
+    metadata:
+      labels: 
+        app: simple-api
+    spec: 
+      containers:
+        - name: simple-api
+          image: docker.io/alexbatista26/api
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: "200m"
+            requests:
+              memory: 96Mi
+              cpu: "100m"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-api
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  selector:
+    app: simple-api
+  ports:
+   - protocol: TCP
+     port: 8080
+     targetPort: 8080
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-simple-api
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-poc"
+spec:
+  ingressClassName: nginx
+  rules: 
+    - host: ingress-poc.suite.ce.gov.br
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/api/"
+            backend:
+              service:
+                name: simple-api
+                port:
+                  number: 8080
+
+  tls:
+    - hosts:
+      - ingress-poc.suite.ce.gov.br
+      secretName: letsencrypt-poc
