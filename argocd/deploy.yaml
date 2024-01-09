@@ -5,7 +5,7 @@ metadata:
     app: simple-api
   name: simple-api
 spec:
-  replicas: 6
+  replicas: 3
   revisionHistoryLimit: 3
   strategy:
     type: RollingUpdate
