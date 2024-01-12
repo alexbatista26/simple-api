@@ -34,12 +34,12 @@ spec:
             requests:
               memory: 96Mi
               cpu: "100m"
-        env:
-          - name: ALEK
-            valueFrom:
-              secretKeyRef:
-                name: simple-api
-                key: alek
+      env:
+        - name: ALEK
+          valueFrom:
+            secretKeyRef:
+              name: simple-api
+              key: alek
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
