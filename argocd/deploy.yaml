@@ -37,9 +37,9 @@ spec:
           env:
            - name: ALEK
               valueFrom:
-                secretKeyRef:
-                  name: simple-api
-                  key: alek
+              secretKeyRef:
+                name: simple-api
+                key: alek
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
