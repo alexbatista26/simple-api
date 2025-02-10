@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  labels:
+    {{- include "simple-api.labels" . | nindent 4 }}
+  name:  {{ include "simple-api.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisions }}
+{{ with .Values.strategy }}
+  strategy:
+    type: {{ .type }}
+    rollingUpdate:
+      maxSurge: {{ .maxSurge }}
+      maxUnavailable: {{ .maxUnavailable }}
+  {{ end }}
+  selector:
+    matchLabels:
+      {{- include "simple-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: 
+        {{- include "simple-api.selectorLabels" . | nindent 8 }}
+    spec: 
+      containers:
+        - name: {{ include "simple-api.fullname" .}}
+          {{ with .Values.strategy }}
+          image: {{ .repository }}
+          imagePullPolicy: {{ .pullPolicy }}
+          {{ end }}
+          ports:
+            {{- range .Values.containerPort }}
+            - containerPort: {{ . }}
+              protocol: TCP
+              {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
