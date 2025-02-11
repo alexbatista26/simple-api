@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: simple-api
+  namespace: argocd  
+spec:
+  project: default  
+  source:
+    repoURL: https://github.com/alexbatista26/simple-api.git 
+    targetRevision: master 
+    path: charts-simple-api/
+  destination:
+    server: https://192.168.0.100:6443  
+    namespace: default 
+  syncPolicy:
+    automated:
+      prune: true  
+      selfHeal: true 
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true 
